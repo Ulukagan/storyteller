@@ -1,0 +1,6 @@
+streamlit
+logging
+vertexai
+google-cloud-logging
+google-cloud-aiplatform
+python-dotenv
