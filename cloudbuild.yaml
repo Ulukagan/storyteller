@@ -15,6 +15,3 @@ logsBucket: "gs://storyteller-cloudbuild-logs"
 
 # (Optional) Use a specific service account with required permissions
 serviceAccount: "cloud-build-sa@storyteller-449312.iam.gserviceaccount.com"
-# Logging setup
-options:
-  logging: CLOUD_LOGGING_ONLY
