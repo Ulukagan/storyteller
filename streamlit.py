@@ -25,7 +25,7 @@ def show_login_page():
     display_welcome_header()
 
     st.markdown("<h2 style='text-align: left; font-size: 18px;'>Lütfen gecerli bir email adresi giriniz</h2>", unsafe_allow_html=True)
-    email = st.text_input('', placeholder='Email Adresi', value=st.session_state.email)
+    email = st.text_input('Email:', placeholder='Email Adresi', value=st.session_state.email)
     if st.button("**Onayla**"):
         if email and is_valid_email(email):
             logger.info(f"Got email")
