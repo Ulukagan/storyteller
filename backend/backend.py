@@ -57,21 +57,19 @@ def get_gemini_pro_text_response(
     }
 
     try: 
-
+         
         responses = model.generate_content(
-            contents,
-            generation_config=config,
-            safety_settings=safety_settings,
-            stream=stream,
-        )
-        logger.info(f"Gemini API Response: {responses}")
+        contents,
+        generation_config=config,
+        safety_settings=safety_settings,
+        stream=True,  # This makes it return a generator
+    )
+
         final_response = []
-        if isinstance(responses, list):  # Streamed response
-            final_response = [r.text for r in responses if hasattr(r, "text")]
-        elif hasattr(responses, "text"):  # Single response
-            final_response = [responses.text]
-        else:
-            final_response = ["Hikaye olustururken bir hata olustu!"]
+        for response in responses:  # Iterate over the generator
+            if hasattr(response, "text"):
+                final_response.append(response.text)
+
         return " ".join(final_response)
 
     except Exception as e:
