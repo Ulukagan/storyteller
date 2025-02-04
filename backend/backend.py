@@ -56,24 +56,29 @@ def get_gemini_pro_text_response(
         HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
     }
 
-    try: 
-         
+    try:
+        # ✅ Generate response first
         responses = model.generate_content(
-        contents,
-        generation_config=config,
-        safety_settings=safety_settings,
-        stream=True,  # This makes it return a generator
-    )
+            contents,
+            generation_config=config,
+            safety_settings=safety_settings,
+            stream=stream,
+        )
 
         final_response = []
-        for response in responses:  # Iterate over the generator
-            if hasattr(response, "text"):
-                final_response.append(response.text)
+        if isinstance(responses, list):
+            for response in responses:
+                if hasattr(response, "text"):
+                    final_response.append(response.text)
+                elif isinstance(response, dict) and "text" in response:
+                    final_response.append(response["text"])
+        elif hasattr(responses, "text"):
+            final_response.append(responses.text)
 
         return " ".join(final_response)
 
     except Exception as e:
-            logger.error(f'Gemini API hatasi: {e}')
-            return 'Hikaye olustururken bir hata olustu!'
+        logger.error(f'Gemini API hatasi: {e}')
+        return 'Hikaye olustururken bir hata olustu!'
 
 st.header("Vertex AI Gemini API", divider="gray")
