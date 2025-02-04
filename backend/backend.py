@@ -17,8 +17,11 @@ logger = logging.getLogger(__name__)
 log_client = cloud_logging.Client()
 log_client.setup_logging()
 
-PROJECT_ID = os.environ.get("storyteller-449312")  # Your Google Cloud Project ID
-LOCATION = os.environ.get("eu-west1")  # Your Google Cloud Project Region
+PROJECT_ID = os.getenv("PROJECT_ID")  
+LOCATION = os.getenv("LOCATION")
+
+#PROJECT_ID = os.environ.get("storyteller-449312")  # Your Google Cloud Project ID
+#LOCATION = os.environ.get("eu-west1")  # Your Google Cloud Project Region
 vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 # prompt = """
@@ -61,15 +64,16 @@ def get_gemini_pro_text_response(
             safety_settings=safety_settings,
             stream=stream,
         )
-
+        print(responses)
         final_response = []
-        for response in responses:
-            try:
-                 final_response.append(response.text)
-            except IndexError:
-                 final_response.append("")
-                 continue
-        #final_response.append(response.text if hasattr(response, "text") else "")
+        if isinstance(responses, list):
+            for response in responses:
+                if hasattr(response, "text"):
+                    final_response.append(response.text)
+                elif isinstance(response, dict):
+                    final_response.append(response.get("text", ""))
+        elif hasattr(responses, "text"):
+            final_response.append(responses.text)
         return " ".join(final_response)
     except Exception as e:
             logger.error(f'Gemini API hatasi: {e}')
