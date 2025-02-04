@@ -10,27 +10,24 @@ from vertexai.preview.generative_models import (
     HarmCategory
 )
 
-# configure logging
+# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-# attach a Cloud Logging handler to the root logger
+
+# Attach a Cloud Logging handler to the root logger
 log_client = cloud_logging.Client()
 log_client.setup_logging()
 
+# Get environment variables
 PROJECT_ID = os.getenv("PROJECT_ID")  
 LOCATION = os.getenv("LOCATION")
 
-#PROJECT_ID = os.environ.get("storyteller-449312")  # Your Google Cloud Project ID
-#LOCATION = os.environ.get("eu-west1")  # Your Google Cloud Project Region
-vertexai.init(project=PROJECT_ID, location=LOCATION)
+# Ensure environment variables are set correctly
+if not PROJECT_ID or not LOCATION:
+    logger.error("PROJECT_ID or LOCATION environment variable is missing!")
 
-# prompt = """
-# Ben bir hikaye yaratici yapay zeka uygulamasiyim. Cocuklar icin ahlaki degerlere uygun
-# hikayeler olusturuyorum. {konu} \n
-# ile alakali ortalama okuma süresi {süre} dakika olacak bir hikaye olustur. Bu hikayeyle ilgili görsellerde yaratabilirsin. 
-# Olusturdugun hikayeler cocugun hayal gücünü artirici, merak uyandiracak sekilde 3 ile 8 yas arasi cocuklara
-# hitap etsin. 
-# """
+# Initialize Vertex AI
+vertexai.init(project=PROJECT_ID, location=LOCATION)
 
 @st.cache_resource
 def load_models():
@@ -48,7 +45,7 @@ def get_gemini_pro_text_response(
     model: GenerativeModel,
     contents: str,
     stream: bool = True
-    ):
+):
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
         HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
@@ -65,20 +62,34 @@ def get_gemini_pro_text_response(
             stream=stream,
         )
 
+        logger.info(f"Raw Gemini API Response: {responses}")
+
         final_response = []
-        if isinstance(responses, list):
+        
+        # ✅ Check if response is a generator (streaming)
+        if hasattr(responses, "__iter__"):
             for response in responses:
                 if hasattr(response, "text"):
                     final_response.append(response.text)
                 elif isinstance(response, dict) and "text" in response:
                     final_response.append(response["text"])
+        
+        # ✅ Non-streaming response
         elif hasattr(responses, "text"):
             final_response.append(responses.text)
 
-        return " ".join(final_response)
+        result = " ".join(final_response)
+        logger.info(f"Processed Response: {result}")
+        
+        return result or "Hikaye olusturulamadi!"  # Return a default message if empty
 
     except Exception as e:
         logger.error(f'Gemini API hatasi: {e}')
         return 'Hikaye olustururken bir hata olustu!'
 
 st.header("Vertex AI Gemini API", divider="gray")
+
+# Test Button for Debugging
+if st.button("Test Gemini API"):
+    story = get_gemini_pro_text_response(text_model_pro, "Bir orman macerasi hikayesi yarat")
+    st.write(story)
