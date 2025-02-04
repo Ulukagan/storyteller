@@ -44,7 +44,7 @@ config = GenerationConfig(
 def get_gemini_pro_text_response(
     model: GenerativeModel,
     contents: str,
-    stream: bool = True
+    stream: bool = False
 ):
     safety_settings = {
         HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
