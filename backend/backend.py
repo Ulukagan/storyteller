@@ -66,21 +66,20 @@ def get_gemini_pro_text_response(
 
         final_response = []
         
-            # ✅ Convert generator to a list (if streaming)
-        if isinstance(responses, (list, tuple)):  
-            for response in responses:
-                if hasattr(response, "text"):
-                    final_response.append(response.text)
-                elif isinstance(response, dict) and "text" in response:
-                    final_response.append(response["text"])
+            # ✅ Convert generator to list to process properly
+        if isinstance(responses, (list, tuple)):
+            response_list = responses  # Already a list, process it directly
+        elif hasattr(responses, "__iter__"):  
+            response_list = list(responses)  # Convert generator to a list
+        else:
+            response_list = [responses]  # Single object case
 
-        elif hasattr(responses, "__iter__"):  # ✅ Handle streaming (generator case)
-            for response in list(responses):  # Convert generator to list
-                if hasattr(response, "text"):
-                    final_response.append(response.text)
-
-        elif hasattr(responses, "text"):  # ✅ Non-streaming response
-            final_response.append(responses.text)
+        # ✅ Extract text from each response
+        for response in response_list:
+            if hasattr(response, "text"):
+                final_response.append(response.text)
+            elif isinstance(response, dict) and "text" in response:
+                final_response.append(response["text"])
 
         result = " ".join(final_response)
         logger.info(f"Processed Response: {result}")
