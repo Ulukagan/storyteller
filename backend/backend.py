@@ -66,16 +66,20 @@ def get_gemini_pro_text_response(
 
         final_response = []
         
-        # ✅ Check if response is a generator (streaming)
-        if hasattr(responses, "__iter__"):
+            # ✅ Convert generator to a list (if streaming)
+        if isinstance(responses, (list, tuple)):  
             for response in responses:
                 if hasattr(response, "text"):
                     final_response.append(response.text)
                 elif isinstance(response, dict) and "text" in response:
                     final_response.append(response["text"])
-        
-        # ✅ Non-streaming response
-        elif hasattr(responses, "text"):
+
+        elif hasattr(responses, "__iter__"):  # ✅ Handle streaming (generator case)
+            for response in list(responses):  # Convert generator to list
+                if hasattr(response, "text"):
+                    final_response.append(response.text)
+
+        elif hasattr(responses, "text"):  # ✅ Non-streaming response
             final_response.append(responses.text)
 
         result = " ".join(final_response)
@@ -88,8 +92,3 @@ def get_gemini_pro_text_response(
         return 'Hikaye olustururken bir hata olustu!'
 
 st.header("Vertex AI Gemini API", divider="gray")
-
-# Test Button for Debugging
-if st.button("Test Gemini API"):
-    story = get_gemini_pro_text_response(text_model_pro, "Bir orman macerasi hikayesi yarat")
-    st.write(story)
