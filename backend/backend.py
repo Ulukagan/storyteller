@@ -64,17 +64,16 @@ def get_gemini_pro_text_response(
             safety_settings=safety_settings,
             stream=stream,
         )
-        print(responses)
+        logger.info(f"Gemini API Response: {responses}")
         final_response = []
-        if isinstance(responses, list):
-            for response in responses:
-                if hasattr(response, "text"):
-                    final_response.append(response.text)
-                elif isinstance(response, dict):
-                    final_response.append(response.get("text", ""))
-        elif hasattr(responses, "text"):
-            final_response.append(responses.text)
+        if isinstance(responses, list):  # Streamed response
+            final_response = [r.text for r in responses if hasattr(r, "text")]
+        elif hasattr(responses, "text"):  # Single response
+            final_response = [responses.text]
+        else:
+            final_response = ["Hikaye olustururken bir hata olustu!"]
         return " ".join(final_response)
+
     except Exception as e:
             logger.error(f'Gemini API hatasi: {e}')
             return 'Hikaye olustururken bir hata olustu!'
