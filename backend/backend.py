@@ -5,9 +5,7 @@ from google.cloud import logging as cloud_logging
 import vertexai
 from vertexai.preview.generative_models import (
     GenerationConfig,
-    GenerativeModel,
-    HarmBlockThreshold,
-    HarmCategory
+    GenerativeModel
 )
 
 # Configure logging
@@ -46,25 +44,11 @@ def get_gemini_pro_text_response(
     contents: str,
     stream: bool = False
 ):
-    # safety_settings = {
-    #     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
-    #     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
-    #     HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_NONE,
-    #     HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_NONE,
-    # }
-    safety_settings = [
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_ONLY_HIGH"},
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_ONLY_HIGH"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_ONLY_HIGH"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_ONLY_HIGH"}
-    ]
-
     try:
-        # ✅ Generate response first
+        # ✅ Generate response without safety settings (default Google filtering applies)
         responses = model.generate_content(
             contents,
             generation_config=config,
-            safety_settings=safety_settings,
             stream=stream,
         )
 
@@ -72,13 +56,13 @@ def get_gemini_pro_text_response(
 
         final_response = []
         
-            # ✅ Convert generator to list to process properly
+        # ✅ Convert generator to list to process properly
         if isinstance(responses, (list, tuple)):
-            response_list = responses  # Already a list, process it directly
+            response_list = responses  
         elif hasattr(responses, "__iter__"):  
-            response_list = list(responses)  # Convert generator to a list
+            response_list = list(responses)  
         else:
-            response_list = [responses]  # Single object case
+            response_list = [responses]  
 
         # ✅ Extract text from each response
         for response in response_list:
@@ -90,7 +74,7 @@ def get_gemini_pro_text_response(
         result = " ".join(final_response)
         logger.info(f"Processed Response: {result}")
         
-        return result or "Hikaye olusturulamadi!"  # Return a default message if empty
+        return result or "Hikaye olusturulamadi!"  
 
     except Exception as e:
         logger.error(f'Gemini API hatasi: {e}')
