@@ -36,7 +36,7 @@ text_model_pro = load_models()
 # Generation Config
 config = GenerationConfig(
     temperature=0.7,
-    max_output_tokens=1024
+    max_output_tokens=5000
 )
 
 def get_gemini_pro_text_response(
