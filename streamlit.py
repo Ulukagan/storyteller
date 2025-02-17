@@ -64,9 +64,12 @@ def show_story_teller_page():
 
     generate_t2t = st.button("Hikayeni olustur.", key="generate_t2t")
     if generate_t2t and konu and süre:
-        prompt = f"{konu} konulu, {süre} dakika okuma süresince bir cocuk hikayesi oluştur. Hikaye olustururken cocuklarin yaraticiligini gelistirici
-        örnekler vermeye calis. Hikayeleri her defasinda cesitlendir ve zenginlestir."
-        # st.write(prompt)
+        prompt = f"""{konu} konulu, {süre} dakika okuma süresince bir çocuk hikayesi oluştur. 
+        Hikaye oluştururken çocukların yaratıcılığını geliştirici örnekler vermeye çalış. 
+        Hikayeleri her defasında çeşitlendir ve zenginleştir. 
+        Çocukların ilgisini çekecek, merak uyandıracak ve hayal güçlerini harekete geçirecek bir anlatım kullan.
+        Türk kültürüne ve değerlerine uygun bir hikaye olsun.
+        """
         with st.spinner("Hikayeniz olusturuluyor..."):
             response = get_gemini_pro_text_response(
                     text_model_pro,
