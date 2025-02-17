@@ -68,7 +68,7 @@ def show_story_teller_page():
         Hikaye oluştururken çocukların yaratıcılığını geliştirici örnekler vermeye çalış. 
         Hikayeleri her defasında çeşitlendir ve zenginleştir. 
         Çocukların ilgisini çekecek, merak uyandıracak ve hayal güçlerini harekete geçirecek bir anlatım kullan.
-        Türk kültürüne ve değerlerine uygun bir hikaye olsun.
+        Türk kültürüne ve değerlerine uygun bir hikaye olsun. Bunlarin hepsini bütüncül sekilde cocuk hikasi gibi olustur. 
         """
         with st.spinner("Hikayeniz olusturuluyor..."):
             response = get_gemini_pro_text_response(
