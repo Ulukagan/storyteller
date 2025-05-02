@@ -1,4 +1,4 @@
-#🧠 Storyteller
+🧠 #Storyteller
 Storyteller is a Streamlit-based application that leverages LLM (e.g., Gemini Pro) to help users generate creative stories interactively through a chat interface.
 
 🚀 Features
